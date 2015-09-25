@@ -4,8 +4,8 @@
 ids <- scan("ids",skip=2)
 # this is phs000145.v4.pht000659.v2.p2.c1.POPRES_v1_v2_Subject_Phenotypes.GRU.txt.gz
 # BUT WITH EXTRA TAB ADDED AT END OF HEADER LINE
-euro <- read.table("sample-info-2.txt",skip=10,header=TRUE,sep='\t',row.names=NULL)
-euro <- subset(euro, euro[,1] %in% ids  )
+euro <- read.table("sample-info-2.txt",skip=10,header=TRUE,sep='\t')
+euro <- subset(euro, euro$SUBJID %in% ids  )
 
 
 # List of countries, with 0 or 1 if in europe or not
