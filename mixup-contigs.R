@@ -24,3 +24,12 @@ cmdlines <- with( cmds, paste( "cat chr1.tped | tail -n +", skip.lines+1, " | he
                 ifelse(rev==1,"| tac",""), " | gzip -c >chr1_contig_", contig, ".tped.gz", sep= '' ) )
 
 cat(paste(cmdlines,collapse="\n"))
+
+write.table( data.frame(
+                endbreak=breakpoints[-1],
+                min=minpoints,
+                max=maxpoints,
+                skip=skip.lines,
+                nlines=n.lines,
+                order=contig.order
+            ), file="chr1_contig_order.tsv", sep="\t" )
