@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -q cmb
 #PBS -l nodes=1:ppn=1
-#PBS -l walltime=120:00:00
+#PBS -l walltime=36:00:00
 #PBS -l pmem=4gb
 #PBS -l mem=500mb
 #PBS -l vmem=5gb
