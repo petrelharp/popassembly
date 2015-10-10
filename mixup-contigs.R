@@ -1,4 +1,5 @@
 # zcat ../thedata/POPRES_Genotypes_QC2_v2_TXT.tped.gz | awk '$1 == 1' > chr1.tped
+# note that the column IDs is in ../thedata/POPRES_Genotypes_QC2_v2_TXT.tfam.gz
 
 pos <- scan( pipe("awk '{print $4}' <chr1.tped") )
 breakpoints <- c(0,cumsum(rexp(60,40/max(pos))))
@@ -31,5 +32,6 @@ write.table( data.frame(
                 max=maxpoints,
                 skip=skip.lines,
                 nlines=n.lines,
-                order=contig.order
-            ), file="chr1_contig_order.tsv", sep="\t" )
+                orig_order=contig.order,
+                contig=seq_along(contig.order)
+            ), file="chr1_contig_order.tsv", row.names=FALSE, sep="\t" )
