@@ -14,7 +14,7 @@ then
     source /usr/usc/java/1.8.0_45/setup.sh 
     JAVA="java -Xmx3500m"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
-    export _JAVA_OPTIONS="-Xmx3500m -XX:CompressedClassSpaceSize=5m"
+    export _JAVA_OPTIONS="-Xmx2g -XX:CompressedClassSpaceSize=2g"
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
