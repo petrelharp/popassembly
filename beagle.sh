@@ -12,8 +12,9 @@ if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
 then
     # on the cluster
     source /usr/usc/java/1.8.0_45/setup.sh 
-    JAVA="java -Xmx4000m"
+    JAVA="java -Xmx3500m"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
+    export _JAVA_OPTIONS="-Xmx3500m"
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
