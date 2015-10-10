@@ -1,4 +1,12 @@
 #!/bin/bash
+#PBS -S /bin/bash
+#PBS -q cmb
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=120:00:00
+#PBS -l pmem=4gb
+#PBS -l mem=500mb
+#PBS -l vmem=5gb
+
 
 if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
 then
@@ -14,6 +22,7 @@ else
     if ! [ $# -eq 1 ]
     then
         echo "Usage: beagle.sh (.vcf file)"
+        echo "or: qsub -vVCF_FILE='chrom_17_204992/chrom_204992_contig_15.vcf.gz' beagle.sh"
         exit 1
     fi
 
@@ -22,4 +31,11 @@ fi
 
 echo "VCF  file: $VCF_FILE"
 echo "beagle: $BEAGLE"
+
+if [[ -z ${VCF_FILE:-} ]]
+then
+    echo "Can't find $VCF_FILE or $BEAGLE"
+    exit 1
+fi
+
 $JAVA -jar $BEAGLE gt=$VCF_FILE ibd=true out=${VCF_FILE%%.vcf.gz}.beagle
