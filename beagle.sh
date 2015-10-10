@@ -20,11 +20,6 @@ else
     VCF_FILE="$1"
 fi
 
-
-if ! [ -n ${VCF_FILE:-} -a -n ${BEAGLE:-} -a -f ${VCF_FILE:-} -a -f ${BEAGLE:-} ]
-then
-    echo "Can't find" $VCF_FILE
-    exit 1
-fi
-
+echo "VCF  file: $VCF_FILE"
+echo "beagle: $BEAGLE"
 $JAVA -jar $BEAGLE gt=$VCF_FILE ibd=true out=${VCF_FILE%%.vcf.gz}.beagle
