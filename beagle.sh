@@ -4,8 +4,8 @@
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=36:00:00
 #PBS -l pmem=4gb
-#PBS -l mem=500mb
-#PBS -l vmem=5gb
+#PBS -l mem=4gb
+#PBS -l vmem=4gb
 
 
 if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
