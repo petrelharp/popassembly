@@ -21,7 +21,7 @@ else
 fi
 
 
-if ! [ -f ${VCF_FILE:-} ]
+if ! [ -n ${VCF_FILE:-} -a -n ${BEAGLE:-} -a -f ${VCF_FILE:-} -a -f ${BEAGLE:-} ]
 then
     echo "Can't find" $VCF_FILE
     exit 1
