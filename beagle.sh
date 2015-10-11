@@ -15,9 +15,9 @@ if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
 then
     # on the cluster
     source /usr/usc/java/1.8.0_45/setup.sh 
-    JAVA="java -Xmx8000m -XX:MaxMetaspaceSize=1200m"
+    JAVA="java -Xmx10000m -XX:MaxMetaspaceSize=1200m"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
-    export _JAVA_OPTIONS="-Xmx8000m -XX:MaxMetaspaceSize=1200m"
+    export _JAVA_OPTIONS="-Xmx10000m -XX:MaxMetaspaceSize=1200m"
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
