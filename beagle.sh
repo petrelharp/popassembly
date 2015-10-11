@@ -18,6 +18,7 @@ then
     JAVA="java -Xmx8000m -XX:MaxMetaspaceSize=1200m"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
     export _JAVA_OPTIONS="-Xmx8000m -XX:MaxMetaspaceSize=1200m"
+    cd $PBS_O_WORKDIR
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
