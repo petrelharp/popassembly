@@ -18,21 +18,21 @@ then
     JAVA="java -Xmx8000m -XX:MaxMetaspaceSize=1200m"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
     export _JAVA_OPTIONS="-Xmx8000m -XX:MaxMetaspaceSize=1200m"
-    cd $PBS_O_WORKDIR
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
     BEAGLE="/home/peter/software/beagle/beagle.09Oct15.56b.jar"
 
-    if ! [ $# -eq 1 ]
-    then
-        echo "Usage: beagle.sh (.vcf file)"
-        echo "or: qsub -vVCF_FILE='chrom_17_204992/chrom_204992_contig_15.vcf.gz' beagle.sh"
-        exit 1
-    fi
-
-    VCF_FILE="$1"
 fi
+
+if ! [ $# -eq 1 ]
+then
+    echo "Usage: beagle.sh (.vcf file)"
+    echo "or: qsub -vVCF_FILE='chrom_17_204992/chrom_204992_contig_15.vcf.gz' beagle.sh"
+    exit 1
+fi
+
+VCF_FILE="$1"
 
 echo "VCF  file: $VCF_FILE"
 echo "beagle: $BEAGLE"
