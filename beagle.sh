@@ -3,9 +3,9 @@
 #PBS -q cmb
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=24:00:00
-#PBS -l pmem=12gb
-#PBS -l mem=12gb
-#PBS -l vmem=12gb
+#PBS -l pmem=24gb
+#PBS -l mem=24gb
+#PBS -l vmem=24gb
 
 # grr, java
 # see http://stackoverflow.com/questions/31075761/java-8-reserves-minimum-1g-for-metaspace-despite-maxmetaspacesize
@@ -15,9 +15,9 @@ if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
 then
     # on the cluster
     source /usr/usc/java/1.8.0_45/setup.sh 
-    JAVA="java -Xmx10000m -XX:MaxMetaspaceSize=1200m"
+    export _JAVA_OPTIONS="-Xmx21000m -XX:MaxMetaspaceSize=2200m"
+    JAVA="java $_JAVA_OPTIONS"
     BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
-    export _JAVA_OPTIONS="-Xmx10000m -XX:MaxMetaspaceSize=1200m"
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
