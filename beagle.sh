@@ -33,6 +33,7 @@ then
 fi
 
 VCF_FILE="$1"
+RUN_ID=$RANDOM
 
 echo "VCF  file: $VCF_FILE"
 echo "beagle: $BEAGLE"
@@ -43,4 +44,4 @@ then
     exit 1
 fi
 
-$JAVA -jar $BEAGLE gt=$VCF_FILE ibd=true out=${VCF_FILE%%.vcf.gz}.beagle
+$JAVA -jar $BEAGLE gt=$VCF_FILE ibd=true out=${VCF_FILE%%.vcf.gz}.${RUN_ID}.beagle
