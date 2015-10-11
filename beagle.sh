@@ -7,6 +7,9 @@
 #PBS -l mem=12gb
 #PBS -l vmem=12gb
 
+# grr, java
+# see http://stackoverflow.com/questions/31075761/java-8-reserves-minimum-1g-for-metaspace-despite-maxmetaspacesize
+
 
 if [ -e /usr/usc/java/1.8.0_45/setup.sh ]
 then
