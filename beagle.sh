@@ -17,11 +17,11 @@ then
     source /usr/usc/java/1.8.0_45/setup.sh 
     export _JAVA_OPTIONS="-Xmx18000m -XX:MaxMetaspaceSize=1200m"
     JAVA="java $_JAVA_OPTIONS"
-    BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.09Oct15.56b.jar"
+    BEAGLE="/home/rcf-40/pralph/cmb/software/beagle/beagle.jar"
 else
     # at home
     JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
-    BEAGLE="/home/peter/software/beagle/beagle.09Oct15.56b.jar"
+    BEAGLE="/home/peter/software/beagle/beagle.jar"
 
 fi
 
