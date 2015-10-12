@@ -31,7 +31,7 @@ gzip ${TPED_FILE%.gz}
 pushd $TEMPDIR || ( echo "can't change directories to $TEMPDIR"; exit 1 )
 pseq $TPED_NAME new-project
 pseq ${TPED_NAME}.pseq load-plink --file $TPED_NAME --id $TPED_NAME
-pseq ${TPED_NAME}.pseq write-vcf | awk '$5 == "0" { $5="A" }; {print;}' | gzip -c >../${TPED_NAME}.vcf.gz
+pseq ${TPED_NAME}.pseq write-vcf | awk ' BEGIN {OFS="\t"} $5 == "0" { $5="A" }; {print;}' | gzip -c >../${TPED_NAME}.vcf.gz
 popd
 rm -rf $TEMPDIR
 

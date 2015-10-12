@@ -28,7 +28,6 @@ fi
 if ! [ $# -eq 1 ]
 then
     echo "Usage: beagle.sh (.vcf file)"
-    echo "or: qsub -vVCF_FILE='chrom_17_204992/chrom_204992_contig_15.vcf.gz' beagle.sh"
     exit 1
 fi
 
