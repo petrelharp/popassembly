@@ -1,0 +1,14 @@
+#PBS -S /bin/bash
+#PBS -q cmb
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=24:00:00
+#PBS -l pmem=24gb
+#PBS -l mem=24gb
+#PBS -l vmem=24gb
+#PBS -t 1-553%150
+
+
+cd $PBS_O_WORKDIR
+
+VCF_FILE=$(head -n $PBS_ARRAYID all-vcfs | tail -n 1)
+../beagle.sh $VCF_FILE
