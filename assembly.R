@@ -73,16 +73,17 @@ write.csv(ibdtable,"ibdshared_table.csv",row.names=FALSE)
 
 # TOO BIG: model matrix is of size 10^10
 # the.glm <- glm(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable)
-# better?
+# this works:
 library(MatrixModels)
 the.glm <- glm4(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable,sparse=TRUE)
 
-resid(the.glm) -> resid
-cbind(ibdtable,resid) -> N.resid
-N.resid$resid2 <- N.resid$N-fitted(the.glm)
-N.resid$resid3 <- N.resid$resid2/sqrt(fitted(the.glm))
+ibdtable$resid <- resid(the.glm)
+ibdtable$resid2 <- N.resid$N-fitted(the.glm)
+ibdtable$resid3 <- N.resid$resid2/sqrt(fitted(the.glm))
+write.csv(ibdtable,"ibdshared_table_with_resids.csv",row.names=FALSE)
+
 #here we use the second score alone which performs best in former test
-tmp <- aggregate( N.resid$resid2,by=list(N.resid$contig1,N.resid$contig2),FUN="mean")
+tmp <- aggregate( ibdtable$resid2,by=list(ibdtable$contig1,ibdtable$contig2),FUN="mean")
 colnames(tmp) <- c("contig1","contig2","resid")
 tmp <- tmp[order(tmp$resid,decreasing = TRUE),]
 write.table(tmp,"A.sorted.txt",row.names = FALSE)
