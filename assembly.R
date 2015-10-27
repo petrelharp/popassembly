@@ -1,22 +1,26 @@
-#this script servrs assembly the contgigs by assemblying pair of contigs which has the highest value of residue
+#this script servrs assembly the contgigs by assemblying pair of contigs which has the highest value of residual
 #read the table that stores the number of ibd shared by each pair of country on each pair
 # of contigs
 #setwd("/Users/xzge/Desktop/codes_ibd")
-A <- read.csv("contig_all_ibdshared.csv",header=FALSE)
+
+# read in the data
+A <- read.csv("contig_all_ibdshared.csv",header=TRUE)  # peter added a header
+
+# collapse to fewer populations
 divide<-function (country) {  
-  if (country %in% easterns) 1
-  else if (country %in% northerns) 2
-  else if (country %in% mideasterns) 3
-  else if (country %in% italy) 4
-  else if (country %in% iberia) 5
-  else if (country %in% france) 6
-  else if (country %in% UK) 7
-  else if (country %in% bene) 8
-  else if (country %in% swiss) 9
-  else if (country %in% german) 10
-  else if (country %in% swiss.french) 11
-  else if (country %in% swiss.german) 12
-  else NA
+  ifelse (country %in% easterns, 1,
+  ifelse (country %in% northerns, 2,
+  ifelse (country %in% mideasterns, 3,
+  ifelse (country %in% italy, 4,
+  ifelse (country %in% iberia, 5,
+  ifelse (country %in% france, 6,
+  ifelse (country %in% UK, 7,
+  ifelse (country %in% bene, 8,
+  ifelse (country %in% swiss, 9,
+  ifelse (country %in% german, 10,
+  ifelse (country %in% swiss.french, 11,
+  ifelse (country %in% swiss.german, 12, NA
+          ) ) ) ) ) ) ) ) ) ) ) )
 }
 
 easterns <- c( 'Albania', 'Kosovo', 'Croatia', 'Bosnia', 'Montenegro',
@@ -33,37 +37,48 @@ swiss <- c('Switzerland')
 german <- c('Germany')
 swiss.french<-c('Swiss French')
 swiss.german<-c('Swiss German')
-country.divide1<-sapply(A[,1],divide)
-country.divide2<-sapply(A[,2],divide)
+
+# recode countries  (note this is vectorized now)
+country.divide1 <- divide(A[,1])
+country.divide2 <- divide(A[,2])
+
 #A stores the positive number of ibd shared by each pair of contig and each pair of country
 #As we want to do the generalized linear regression, we have to make a larger table by adding all the 'zeros' into the table
-#the integer 432 below means the number of the contigs
-table<-data.frame(contig1=integer(),contig2=integer(),N=integer(),stringsAsFactors=FALSE)
+#below ncontigs will be 442
+ncontigs <- max(c(A[,3],A[,4]))
+ibdtable<-data.frame(contig1=integer(),contig2=integer(),N=integer(),stringsAsFactors=FALSE)
 div <- c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german")
-id1 <- div[rep(1:12,each=12*choose(442,2))]
-id2 <- div[rep(rep(1:12,each=choose(442,2)),12)]
-ij <- t(combn(1:442,2))
+id1 <- div[rep(1:12,each=12*choose(ncontigs,2))]
+id2 <- div[rep(rep(1:12,each=choose(ncontigs,2)),12)]
+ij <- t(combn(1:ncontigs,2))
 contig1 <- rep(ij[,1],12*12)
 contig2 <- rep(ij[,2],12*12)
-N <- rep(0,choose(442,2)*12*12)
-table <- data.frame(id1,id2,contig1,contig2,N)
+N <- rep(0,choose(ncontigs,2)*12*12)
+ibdtable <- data.frame(id1,id2,contig1,contig2,N)
 N.n <- data.frame(country.divide1,country.divide2,contig1=A[,3],contig2=A[,4],N=A[,5])
 M <- aggregate(N.n$N,by=list(N.n$country.divide1,N.n$country.divide2,N.n$contig1,N.n$contig2),FUN = 'sum')
-col.names <- as.numeric((M[,1]-1)*(12*choose(442,2))+(M[,2]-1)*choose(442,2)+(441+443-M[,3])*(M[,3]-1)/2+M[,4]-M[,3])
-table[col.names,5] <- M[,5]
-colnames(table) <- c("id1","id2","contig1","contig2","N")
-table$id1 <- factor(table$id1,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
-table$id2 <- factor(table$id2,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
-contig.names <- sort(unique(as.numeric(c(table$contig1,table$contig2))))
-table$contig1 <- factor(table$contig1,levels=contig.names)
-table$contig2 <- factor(table$contig2,levels=contig.names)
-table$N<-as.integer(table$N)
-write.csv(table,"ibdshared_table.csv")
-#calculate there different scores of residue with the generalized linear model. The three scores are:
-#residue of GLM, the exact value minus fitted value of GLM, and normalized value of residue of GLM
-the.glm <- glm(table$N~table$contig1+table$contig2+table$id1*table$id2,family=poisson("log"))
+col.names <- as.numeric((M[,1]-1)*(12*choose(ncontigs,2))+(M[,2]-1)*choose(ncontigs,2)+(2*ncontigs-M[,3])*(M[,3]-1)/2+M[,4]-M[,3])
+ibdtable[col.names,5] <- M[,5]
+colnames(ibdtable) <- c("id1","id2","contig1","contig2","N")
+ibdtable$id1 <- factor(ibdtable$id1,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
+ibdtable$id2 <- factor(ibdtable$id2,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
+contig.names <- sort(unique(as.numeric(c(ibdtable$contig1,ibdtable$contig2))))
+ibdtable$contig1 <- factor(ibdtable$contig1,levels=contig.names)
+ibdtable$contig2 <- factor(ibdtable$contig2,levels=contig.names)
+ibdtable$N<-as.integer(ibdtable$N)
+write.csv(ibdtable,"ibdshared_table.csv",row.names=FALSE)
+
+#calculate there different scores of residual with the generalized linear model. The three scores are:
+#residual of GLM, the exact value minus fitted value of GLM, and normalized value of residual of GLM
+
+# TOO BIG: model matrix is of size 10^10
+# the.glm <- glm(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable)
+# better?
+library(MatrixModels)
+the.glm <- glm4(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable,sparse=TRUE)
+
 resid(the.glm) -> resid
-cbind(table,resid) -> N.resid
+cbind(ibdtable,resid) -> N.resid
 N.resid$resid2 <- N.resid$N-fitted(the.glm)
 N.resid$resid3 <- N.resid$resid2/sqrt(fitted(the.glm))
 #here we use the second score alone which performs best in former test
@@ -72,8 +87,8 @@ colnames(tmp) <- c("contig1","contig2","resid")
 tmp <- tmp[order(tmp$resid,decreasing = TRUE),]
 write.table(tmp,"A.sorted.txt",row.names = FALSE)
 #the function that assembly the contigs with a given number of chromosomes 'n' 
-#and a given minimun score of the residue 'min.score'. 'tmp' is the data frame that stores
-#the scores of residue of each pair of contigs. The output is a data frame which contains five columns
+#and a given minimun score of the residual 'min.score'. 'tmp' is the data frame that stores
+#the scores of residual of each pair of contigs. The output is a data frame which contains five columns
 #'contig.id' is the id of each contig, 'left' is the id of the left neighbour, 'right' the right neighbour, 'chrom.id' is the id of the chromosome each contig belongs to
 assembly <- function(n, min.score, tmp) {
    n.assembled <- 0
