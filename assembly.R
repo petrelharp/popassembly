@@ -4,7 +4,7 @@
 #setwd("/Users/xzge/Desktop/codes_ibd")
 
 # read in the data
-A <- read.csv("contig_all_ibdshared.csv",header=TRUE)  # peter added a header
+A <- read.csv("contig_all_ibdshared.csv",header=FALSE)  # peter added a header
 
 # collapse to fewer populations
 divide<-function (country) {  
@@ -74,6 +74,7 @@ write.csv(ibdtable,"ibdshared_table.csv",row.names=FALSE)
 # TOO BIG: model matrix is of size 10^10
 # the.glm <- glm(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable)
 # this works:
+install.packages("MatrixModels")
 library(MatrixModels)
 the.glm <- glm4(N~contig1+contig2+id1*id2,family=poisson("log"),data=ibdtable,sparse=TRUE)
 
@@ -180,5 +181,25 @@ assembly <- function(n, min.score, tmp) {
    }
    sort.table<-data.frame(contig.id,left,right,chrom.id)
 } 
-result <- assembly(800,0.02,tmp)
+result <- assembly(50,0.05,tmp)
 write.table(result,"Result.txt",row.names = FALSE)
+result.to.list <- function( assembly.result ) {
+  chrom.names<-unique(assembly.result$chrom.id)
+  chrom.list<-list()
+  for (i in 1:length(chrom.names)) {
+    chrom.indi<-vector()
+    contig.now <- subset(assembly.result,left==0&chrom.id==chrom.names[i])$contig.id[1]
+    contig.next <- subset(assembly.result,contig.id==contig.now)$right[1]
+    chrom.indi[1]<-contig.now
+    while (contig.next!=0) {
+      contig.now <- contig.next
+      contig.next <- subset(assembly.result,contig.id==contig.now)$right[1]
+      chrom.indi[length(chrom.indi)+1]<-contig.now
+    }
+    if (chrom.names[i]!=0) chrom.list[[length(chrom.list)+1]] <- chrom.indi
+  }
+  for (i in 1:nrow(assembly.result)) {
+    if (assembly.result$left[i]==0&assembly.result$right[i]==0) chrom.list[[length(chrom.list)+1]] <- result$contig.id[i]
+  }
+  chrom.list
+}
