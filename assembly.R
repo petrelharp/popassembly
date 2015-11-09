@@ -38,9 +38,8 @@ german <- c('Germany')
 swiss.french<-c('Swiss French')
 swiss.german<-c('Swiss German')
 
-# recode countries  (note this is vectorized now)
-country.divide1 <- divide(A[,1])
-country.divide2 <- divide(A[,2])
+
+
 
 #A stores the positive number of ibd shared by each pair of contig and each pair of country
 #As we want to do the generalized linear regression, we have to make a larger table by adding all the 'zeros' into the table
@@ -48,24 +47,32 @@ country.divide2 <- divide(A[,2])
 ncontigs <- max(c(A[,3],A[,4]))
 ibdtable<-data.frame(contig1=integer(),contig2=integer(),N=integer(),stringsAsFactors=FALSE)
 div <- c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german")
-id1 <- div[rep(1:12,each=12*choose(ncontigs,2))]
-id2 <- div[rep(rep(1:12,each=choose(ncontigs,2)),12)]
-ij <- t(combn(1:ncontigs,2))
-contig1 <- rep(ij[,1],12*12)
-contig2 <- rep(ij[,2],12*12)
-N <- rep(0,choose(ncontigs,2)*12*12)
-ibdtable <- data.frame(id1,id2,contig1,contig2,N)
-N.n <- data.frame(country.divide1,country.divide2,contig1=A[,3],contig2=A[,4],N=A[,5])
-M <- aggregate(N.n$N,by=list(N.n$country.divide1,N.n$country.divide2,N.n$contig1,N.n$contig2),FUN = 'sum')
-col.names <- as.numeric((M[,1]-1)*(12*choose(ncontigs,2))+(M[,2]-1)*choose(ncontigs,2)+(2*ncontigs-M[,3])*(M[,3]-1)/2+M[,4]-M[,3])
-ibdtable[col.names,5] <- M[,5]
-colnames(ibdtable) <- c("id1","id2","contig1","contig2","N")
-ibdtable$id1 <- factor(ibdtable$id1,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
-ibdtable$id2 <- factor(ibdtable$id2,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
-contig.names <- sort(unique(as.numeric(c(ibdtable$contig1,ibdtable$contig2))))
-ibdtable$contig1 <- factor(ibdtable$contig1,levels=contig.names)
-ibdtable$contig2 <- factor(ibdtable$contig2,levels=contig.names)
-ibdtable$N<-as.integer(ibdtable$N)
+Ndiv <- 12
+Ncontig <- 442
+BuildIBDTable <- function (Ndiv, Ncontig, A) {
+  # recode countries  (note this is vectorized now)
+  country.divide1<-sapply(A[,1],divide)
+  country.divide2<-sapply(A[,2],divide)
+  id1 <- div[rep(1:Ndiv, each=Ndiv*choose(Ncontig,2))]
+  id2 <- div[rep(rep(1:Ndiv, each=choose(Ncontig,2)), Ndiv)]
+  ij <- t(combn(1:Ncontig,2))
+  contig1 <- rep(ij[,1], Ndiv*Ndiv)
+  contig2 <- rep(ij[,2], Ndiv*Ndiv)
+  N <- rep(0,choose(Ncontig,2)*Ndiv*Ndiv)
+  table <- data.frame(id1,id2,contig1,contig2,N)
+  N.n <- data.frame(country.divide1,country.divide2,contig1=A[,3],contig2=A[,4],N=A[,5])
+  M <- aggregate(N.n$N,by=list(N.n$country.divide1,N.n$country.divide2,N.n$contig1,N.n$contig2),FUN = 'sum')
+  col.names <- as.numeric((M[,1]-1)*(Ndiv*choose(Ncontig,2))+(M[,2]-1)*choose(Ncontig,2)+(2*Ncontig-M[,3])*(M[,3]-1)/2+M[,4]-M[,3])
+  table[col.names,5] <- M[,5]
+  colnames(table) <- c("id1","id2","contig1","contig2","N")
+  table$id1 <- factor(table$id1,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
+  table$id2 <- factor(table$id2,levels=c("easterns","northerns","mideasterns","italy","iberia","france","UK","bene","swiss","german","swiss.french","swiss.german"))
+  contig.names <- sort(unique(as.numeric(c(table$contig1,table$contig2))))
+  table$contig1 <- factor(table$contig1,levels=contig.names)
+  table$contig2 <- factor(table$contig2,levels=contig.names)
+  table$N<-as.integer(table$N)
+}
+ibdtable <- BuildIBDTable(12, 442, A)
 write.csv(ibdtable,"ibdshared_table.csv",row.names=FALSE)
 
 #calculate there different scores of residual with the generalized linear model. The three scores are:
@@ -202,4 +209,19 @@ result.to.list <- function( assembly.result ) {
     if (assembly.result$left[i]==0&assembly.result$right[i]==0) chrom.list[[length(chrom.list)+1]] <- result$contig.id[i]
   }
   chrom.list
+}
+contig.table<-read.table("contig_table.txt",stringsAsFactors = FALSE)
+right.answer<-read.table("right-answer.tsv",header = TRUE)
+chrom.list<-result.to.list(result)
+strsplit(contig.table[,2],"_")->list
+contig.table$contig<-as.numeric(sapply(list,fun<-function(x){strsplit(x[4],"[.]")[[1]][1]}))
+contig.table$chrom_contig<-100*contig.table$chrom+contig.table$contig
+right.answer$chrom_contig<-100*right.answer$chrom.code+right.answer$orig_order
+contig.table$true.chrom<-sapply(contig.table$chrom_contig,match_chrom<-function(x) {right.answer$chrom[match(x,right.answer$chrom_contig)]})
+contig.table$true.contig<-sapply(contig.table$chrom_contig,match_chrom<-function(x) {right.answer$contig[match(x,right.answer$chrom_contig)]})
+contig.table$newname<-paste('chrom',contig.table$true.chrom,'_','contig',contig.table$true.contig,sep="")
+for (i in 1:length(chrom.list)) {
+  for (j in 1:length(chrom.list[[i]])) {
+    chrom.list[[i]][j]<-contig.table$newname[match(chrom.list[[i]][j],contig.table$id)]
+  }
 }
